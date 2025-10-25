@@ -9,7 +9,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch("https://farha31.pythonanywhere.com/api/users/login/", {
+      const res = await fetch("https://farha31.pythonanywhere.com/api/login/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
