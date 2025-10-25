@@ -10,7 +10,7 @@ export default function Signup() {
 
   const handleSignup = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/users/signup/", {
+      const res = await fetch("https://farha31.pythonanywhere.com/api/users/signup/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
