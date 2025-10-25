@@ -87,7 +87,7 @@ export default function Signup() {
             Already have an account?{" "}
             <span
               onClick={() => navigate("/login")}
-              className="text-indigo-600 hover:underline cursor-pointer"
+              className="text-purple-600 hover:underline cursor-pointer"
             >
               Login
             </span>
