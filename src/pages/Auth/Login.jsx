@@ -24,7 +24,8 @@ export default function Login() {
       const res = await fetch(`${API_BASE}/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: username.trim(), password })
+        body: JSON.stringify({ email: username.trim(), password }),
+
 
       });
 
@@ -87,15 +88,16 @@ window.dispatchEvent(new Event("userUpdated"));
 
         <div className="space-y-4">
           <div>
-            <label className="block text-gray-600 mb-1">Username</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
+  <label className="block text-gray-600 mb-1">Email</label>
+  <input
+    type="email"
+    className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition"
+    placeholder="Enter your email"
+    value={username}
+    onChange={(e) => setUsername(e.target.value)}
+  />
+</div>
+
 
           <div>
             <label className="block text-gray-600 mb-1">Password</label>
