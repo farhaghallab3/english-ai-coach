@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { useAuth } from "../../context/AuthContext";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -12,8 +11,8 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://farha31.pythonanywhere.com/api";
-  const { login } = useAuth();
+  const API_BASE =
+    import.meta.env.VITE_API_BASE_URL || "https://farha31.pythonanywhere.com/api";
 
   const handleSignup = async () => {
     if (!name || !email || !password || !confirmPassword) {
@@ -41,35 +40,17 @@ export default function Signup() {
 
       const data = await res.json();
 
-      // if (!res.ok) {
-      //   toast.error(data.error || "Signup failed ❌");
-      //   setLoading(false);
-      //   return;
-      // }
-
-    
-      if (res.ok) {
-        const userData = {
-          id: data.user_id,
-          name: data.name,
-          email: data.email,
-          access: data.access,
-          refresh: data.refresh,
-        };
-        login(userData);
-        navigate("/");
+      if (!res.ok) {
+        toast.error(data.error || "Signup failed ❌");
+        setLoading(false);
+        return;
       }
 
-
-      // Save tokens and user info
-      localStorage.setItem("token", data.access);
-      localStorage.setItem("refresh", data.refresh);
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("user_name", data.name);
-      window.dispatchEvent(new Event("userUpdated"));
-
-      toast.success("Signup successful 🎉", { duration: 2000 });
-      setTimeout(() => navigate("/"), 1500);
+      // ✅ بعد التسجيل الناجح يروح إلى صفحة تسجيل الدخول
+      toast.success("Signup successful 🎉 Please log in to continue", {
+        duration: 2500,
+      });
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       console.error(err);
       toast.error("Network error 😥");
