@@ -70,13 +70,14 @@ export default function VoiceChat() {
   const repeatMessage = (text) => {
     speakText(text);
   };
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   // ✅ Get AI response (Gemini via Django backend)
   const getAIResponse = async (userText) => {
     addMessage("ai", "Thinking...");
 
     try {
-      const res = await fetch("https://farha31.pythonanywhere.com/api/ask-gemini/", {
+      const res = await fetch(`${API_BASE}/ask-gemini/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userText }),
