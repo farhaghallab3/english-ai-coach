@@ -92,7 +92,7 @@ window.dispatchEvent(new Event("userUpdated"));
   <input
     type="email"
     className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition"
-    placeholder="Enter your email"
+    placeholder="Enter your name"
     value={username}
     onChange={(e) => setUsername(e.target.value)}
   />
