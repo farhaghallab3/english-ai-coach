@@ -12,7 +12,7 @@ const HomePage = () => {
     { title: "Text to Speech", desc: "Write and listen to perfect pronunciation.", link: "/tts" },
     { title: "Speech to Text", desc: "Speak and see how accurate your speech is.", link: "/stt" },
     { title: "Chat with AI", desc: "Practice conversations with our smart AI.", link: "/chat" },
-    { title: "Pronunciation Practice", desc: "Improve pronunciation with fun challenges!", link: "/practice/:id" },
+    { title: "Pronunciation Practice", desc: "Improve pronunciation with fun challenges!", link: "/practice" },
   ];
 
   const handleCardClick = (link) => {
