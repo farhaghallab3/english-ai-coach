@@ -1,72 +1,94 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Navbar from "../../components/Navbar";
 
-const levels = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const BASE_URL = "https://farha31.pythonanywhere.com/api";
 
-export default function PronunciationPractice() {
+const PronunciationPractice = () => {
+  const [levels, setLevels] = useState(["A1", "A2", "B1", "B2", "C1", "C2"]);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [words, setWords] = useState([]);
+  const [selectedWord, setSelectedWord] = useState(null);
 
   useEffect(() => {
     if (selectedLevel) {
-      fetch(`https://farha31.pythonanywhere.com/api/words/${selectedLevel}/`)
-        .then((res) => res.json())
-        .then((data) => setWords(data))
-        .catch((err) => console.error("Error:", err));
+      axios
+        .get(`${BASE_URL}/words/${selectedLevel}/`)
+        .then((res) => setWords(res.data))
+        .catch((err) => console.error("Error fetching words:", err));
     }
   }, [selectedLevel]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">🎤 Pronunciation Practice</h1>
-
-      {!selectedLevel && (
-        <div className="grid grid-cols-3 gap-4">
-          {levels.map((lvl) => (
-            <button
-              key={lvl}
-              className="p-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
-              onClick={() => setSelectedLevel(lvl)}
-            >
-              {lvl}
-            </button>
-          ))}
-        </div>
+    <>
+    <Navbar/>
+    <div className="p-16 text-center">
+      
+      {!selectedLevel && !selectedWord && (
+        <>
+          <h1 className="text-2xl font-bold mb-6">🎯 Choose Your Level</h1>
+          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+            {levels.map((level) => (
+              <button
+                key={level}
+                onClick={() => setSelectedLevel(level)}
+                className="p-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all"
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+        </>
       )}
 
-      {selectedLevel && (
-        <div>
+      {selectedLevel && !selectedWord && (
+        <>
           <button
-            className="mb-4 px-4 py-2 bg-gray-200 rounded"
             onClick={() => setSelectedLevel(null)}
+            className="mb-4 text-blue-600 underline"
           >
-            ← Back
+            ← Back to Levels
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Words in {selectedLevel}</h2>
+          <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+            {words.map((word) => (
+              <button
+                key={word.id}
+                onClick={() => setSelectedWord(word)}
+                className="p-3 border rounded-xl hover:bg-gray-100"
+              >
+                {word.word}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {selectedWord && (
+        <div className="max-w-lg mx-auto">
+          <button
+            onClick={() => setSelectedWord(null)}
+            className="mb-4 text-blue-600 underline"
+          >
+            ← Back to {selectedLevel} Words
           </button>
 
-          <h2 className="text-xl font-semibold mb-4">Level {selectedLevel}</h2>
+          <h2 className="text-2xl font-bold mb-2">{selectedWord.word}</h2>
+          <p className="text-gray-700 mb-4">{selectedWord.meaning}</p>
 
-          {words.length === 0 ? (
-            <p>Loading...</p>
-          ) : (
-            words.map((word) => (
-              <div
-                key={word.id}
-                className="p-4 mb-4 border rounded-xl shadow-sm bg-white"
-              >
-                <h3 className="text-lg font-bold">{word.word}</h3>
-                <p className="text-gray-600">{word.meaning}</p>
-                <p className="text-sm text-gray-500">{word.type}</p>
-                <ul className="mt-2 text-gray-700 list-disc ml-5">
-                  {[word.example1, word.example2, word.example3, word.example4, word.example5]
-                    .filter(Boolean)
-                    .map((ex, i) => (
-                      <li key={i}>{ex}</li>
-                    ))}
-                </ul>
-              </div>
-            ))
-          )}
+          <h3 className="text-lg font-semibold mb-2">Examples:</h3>
+          <ul className="text-left list-disc ml-6 space-y-2">
+            {[selectedWord.example1, selectedWord.example2, selectedWord.example3, selectedWord.example4, selectedWord.example5]
+              .filter(Boolean)
+              .map((ex, i) => (
+                <li key={i}>{ex}</li>
+              ))}
+          </ul>
         </div>
       )}
     </div>
+    </>
   );
-}
+};
+
+export default PronunciationPractice;

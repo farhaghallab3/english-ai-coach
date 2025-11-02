@@ -8,7 +8,7 @@ import TextToSpeech from "./pages/TTS/TextToSpeech";
 import SpeechToText from "./pages/STT/SpeechToText";
 import ChatWithAI from "./pages/Chat/ChatWithAI";
 import ChatWithWordsAI from "./pages/Chat/ChatWithWordsAI";
-import PracticePage from "./pages/Practice/PronunciationPractice";
+import PronunciationPractice from "./pages/Practice/PronunciationPractice";
 // import Levels from "./pages/Levels";
 // import LevelsPage from "./pages/Practice/LevelsPage";
 
@@ -30,7 +30,7 @@ function App() {
       <Route path = "/chat-words-ai" element = {<ChatWithWordsAI/>} />
         {/* <Route path="/payment" element={<PaymentPage />} /> */}
 {/* <Route path="/practice" element={<LevelsPage />} /> */}
-<Route path="/practice" element={<PracticePage />} />
+<Route path="/practice" element={<PronunciationPractice />} />
 
 
 
