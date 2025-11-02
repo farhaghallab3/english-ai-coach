@@ -25,12 +25,28 @@ const PronunciationPractice = () => {
     }
   }, [selectedLevel]);
 
-  // play pronunciation audio
-  const speak = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    speechSynthesis.speak(utterance);
-  };
+// play pronunciation audio
+const speak = (text) => {
+  // remove punctuation before speaking so it won’t say “dot”
+  const cleanText = text.replace(/[.,!?]/g, "");
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.lang = "en-US";
+  speechSynthesis.speak(utterance);
+};
+
+// normalize text for comparison
+const normalize = (text) => {
+  return text
+    .toLowerCase()
+    // remove spoken punctuation words
+    .replace(/\b(dot|comma|period|question mark|exclamation mark|full stop)\b/gi, "")
+    // remove actual punctuation
+    .replace(/[.,!?]/g, "")
+    // collapse multiple spaces
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
 
   // start recording and compare spoken text
   const startRecording = (expectedText) => {
@@ -46,14 +62,24 @@ const PronunciationPractice = () => {
     recog.start();
 
     recog.onresult = (event) => {
-      const spoken = event.results[0][0].transcript.toLowerCase();
+      const spokenRaw = event.results[0][0].transcript;
+      const spoken = normalize(spokenRaw);
+      const expected = normalize(expectedText);
+
       console.log("Spoken:", spoken);
-      if (spoken.includes(expectedText.toLowerCase())) {
+      console.log("Expected:", expected);
+
+      if (spoken === expected || spoken.includes(expected)) {
         setFeedback("✅ Great job!");
         setTimeout(() => nextExample(), 1000);
       } else {
         setFeedback("❌ Try again!");
       }
+    };
+
+    recog.onerror = (e) => {
+      console.error("Speech recognition error:", e);
+      setFeedback("⚠️ Could not recognize speech. Please try again.");
     };
   };
 
@@ -64,7 +90,6 @@ const PronunciationPractice = () => {
       setCurrentExample((prev) => prev + 1);
       setFeedback("");
     } else {
-      // mark word as completed
       const updated = [...completedWords, selectedWord.word];
       setCompletedWords(updated);
       localStorage.setItem("completedWords", JSON.stringify(updated));
