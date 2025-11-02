@@ -11,7 +11,7 @@ const ChatWithAI = () => {
   const recognitionRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ التأكد من تسجيل الدخول
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("user_id");
@@ -24,13 +24,13 @@ const ChatWithAI = () => {
     if (savedChats) setMessages(JSON.parse(savedChats));
   }, [navigate]);
 
-  // ✅ حفظ المحادثة
+  
   const saveChat = (updated) => {
     const userId = localStorage.getItem("user_id");
     localStorage.setItem(`chat_${userId}`, JSON.stringify(updated));
   };
 
-  // 🎤 تفعيل المايك
+
   const toggleMic = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech Recognition not supported in this browser.");
@@ -59,7 +59,7 @@ const ChatWithAI = () => {
     }
   };
 
-  // 🔊 نطق بصوت راجل فقط
+
   const speak = (text) => {
     const synth = window.speechSynthesis;
     const voices = synth.getVoices();
@@ -77,7 +77,7 @@ const ChatWithAI = () => {
     synth.speak(utter);
   };
 
-  // 📨 إرسال الرسالة
+  
   const handleSend = async (text) => {
     if (!text.trim()) return;
     const userMsg = { sender: "user", text };
@@ -87,17 +87,24 @@ const ChatWithAI = () => {
     setInput("");
 
     try {
-      const res = await fetch("https://farha31.pythonanywhere.com/api/ask-huggingface/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          user_id: localStorage.getItem("user_id"),
-        }),
-      });
+      console.log("Sending to backend:", {
+  question: text,
+  user_id: localStorage.getItem("user_id"),
+});
+
+      const res = await fetch("https://farha31.pythonanywhere.com/api/ask-ai-basic/", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    question: text,    // ✅ was message: text
+    user_id: localStorage.getItem("user_id"),
+  }),
+});
+
 
       const data = await res.json();
-      const botMsg = { sender: "bot", text: data.reply || "Sorry, something went wrong." };
+      const botMsg = { sender: "bot", text: data.answer || "Sorry, something went wrong." };
+
 
       const updatedChat = [...updated, botMsg];
       setMessages(updatedChat);

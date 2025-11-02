@@ -10,7 +10,7 @@ const TextToSpeech = () => {
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
 
-    // 🎙️ نختار صوت راجل إن وُجد
+
     const maleVoice =
       voices.find(
         (v) =>

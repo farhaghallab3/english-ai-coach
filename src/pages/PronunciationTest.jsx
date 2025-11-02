@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
-
 
 const PronunciationTest = () => {
   const [words, setWords] = useState([]);
@@ -9,6 +9,7 @@ const PronunciationTest = () => {
   const [attempts, setAttempts] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
+  const navigate = useNavigate();
 
   // 🎧 Fetch words from Django API
   useEffect(() => {
@@ -28,6 +29,43 @@ const PronunciationTest = () => {
     speechSynthesis.speak(utterance);
   };
 
+  // 🎉 Launch confetti
+  const launchConfetti = () => {
+    const duration = 1.5 * 1000;
+    const end = Date.now() + duration;
+    (function frame() {
+      confetti({
+        particleCount: 4,
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        origin: { x: Math.random(), y: Math.random() - 0.2 },
+      });
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  };
+
+  // 🗣️ Encouragement messages
+  const encouragements = [
+    "Excellent! You nailed it!",
+    "Awesome! Keep it up!",
+    "Perfect pronunciation!",
+    "Well done! You’re improving fast!",
+    "Great job! That was clear and confident!",
+  ];
+
+  const playEncouragement = () => {
+    const randomMsg =
+      encouragements[Math.floor(Math.random() * encouragements.length)];
+    const utterance = new SpeechSynthesisUtterance(randomMsg);
+    utterance.lang = "en-US";
+    utterance.rate = 1;
+    utterance.pitch = 1.1;
+    speechSynthesis.speak(utterance);
+  };
+
   // 🎤 Start recording
   const startListening = () => {
     if (!("webkitSpeechRecognition" in window)) {
@@ -42,134 +80,39 @@ const PronunciationTest = () => {
     recognitionRef.current = recognition;
     recognition.continuous = false;
 
-
     recognition.start();
     setIsListening(true);
     setMessage("🎤 Listening...");
 
-//     recognition.onresult = (event) => {
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.toLowerCase().trim();
+      const correctWord = words[currentIndex].word.toLowerCase().trim();
 
-//       console.log("Speech detected:", event.results);
-//       const transcript = event.results[0][0].transcript.toLowerCase().trim();
-//       console.log("Transcript:", transcript);
-//       const correctWord = words[currentIndex].word.toLowerCase();
+      const isMatch =
+        transcript === correctWord ||
+        transcript.includes(correctWord) ||
+        correctWord.includes(transcript);
 
-//       // if (transcript === correctWord) {
-//       //   setMessage("✅ Excellent! Great job 🎉");
-//       //   setAttempts(0);
-//       //   setTimeout(nextWord, 1500);
-//       // } else {
-//       //   const newAttempts = attempts + 1;
-//       //   setAttempts(newAttempts);
-//       //   if (newAttempts >= 3) {
-//       //     setMessage("😅 Let's skip this one 👉");
-//       //     setTimeout(nextWord, 1500);
-//       //   } else {
-//       //     setMessage("❌ Try again 🔁");
-//       //   }
-//       // }
-//       // 🔍 تحسين التقييم بالنطق
-// const similarity = transcript.includes(correctWord) || correctWord.includes(transcript);
+      if (isMatch) {
+        setMessage("✅ Excellent! Great job 🎉");
+        setAttempts(0);
+        playEncouragement();
+        launchConfetti();
+        setTimeout(nextWord, 2000);
+      } else {
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        if (newAttempts >= 3) {
+          setMessage("😅 Let's skip this one 👉");
+          speakWord();
+          setTimeout(nextWord, 2000);
+        } else {
+          setMessage(`❌ You said: "${transcript}". Try again 🔁`);
+        }
+      }
 
-// if (similarity) {
-//   setMessage("✅ Excellent! Great job 🎉");
-//   setAttempts(0);
-//   setTimeout(nextWord, 1500);
-// } else {
-//   const newAttempts = attempts + 1;
-//   setAttempts(newAttempts);
-
-//   if (newAttempts >= 3) {
-//     speakWord();
-//     setMessage("😅 Let's skip this one 👉");
-//     setTimeout(nextWord, 1500);
-//   } else {
-//     setMessage(`❌ You said: "${transcript}". Try again 🔁`);
-//   }
-// }
-
-//       setIsListening(false);
-//     };
-
-
-const launchConfetti = () => {
-  const duration = 1.5 * 1000; // ثانية ونص
-  const end = Date.now() + duration;
-
-  (function frame() {
-    confetti({
-      particleCount: 4,
-      startVelocity: 30,
-      spread: 360,
-      ticks: 60,
-      origin: { x: Math.random(), y: Math.random() - 0.2 }
-    });
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  })();
-};
-
-
-const encouragements = [
-  "Excellent! You nailed it!",
-  "Awesome! Keep it up!",
-  "Perfect pronunciation!",
-  "Well done! You’re improving fast!",
-  "Great job! That was clear and confident!"
-];
-
-const playEncouragement = () => {
-  const randomMsg =
-    encouragements[Math.floor(Math.random() * encouragements.length)];
-  const utterance = new SpeechSynthesisUtterance(randomMsg);
-  utterance.lang = "en-US";
-  utterance.rate = 1;
-  utterance.pitch = 1.1;
-  utterance.voice = speechSynthesis
-  .getVoices()
-  .find(v => v.name.toLowerCase().includes("female")) || null;
-
-  speechSynthesis.speak(utterance);
-};
-
-
-recognition.onresult = (event) => {
-  const transcript = event.results[0][0].transcript.toLowerCase().trim();
-  const correctWord = words[currentIndex].word.toLowerCase().trim();
-
-  console.log("🎙 Transcript:", transcript);
-  console.log("✅ Correct:", correctWord);
-
-  // 🔍 نسمح بتقارب جزئي عشان ما تكونش المقارنة صارمة
-  const isMatch =
-    transcript === correctWord ||
-    transcript.includes(correctWord) ||
-    correctWord.includes(transcript);
-
-  if (isMatch) {
-  setMessage("✅ Excellent! Great job 🎉");
-  setAttempts(0);
-  console.log("✅ MATCH FOUND!");
-  playEncouragement(); // 🗣️ يشغل صوت تشجيعي
-  launchConfetti(); // 🎉 يطلق الكونفيتي
-  setTimeout(nextWord, 2000);
-} else {
-  const newAttempts = attempts + 1;
-  setAttempts(newAttempts);
-  console.log("❌ Wrong. Attempts:", newAttempts);
-
-  if (newAttempts >= 3) {
-    setMessage("😅 Let's skip this one 👉");
-    speakWord();
-    setTimeout(nextWord, 2000);
-  } else {
-    setMessage(`❌ You said: "${transcript}". Try again 🔁`);
-  }
-}
-
-  setIsListening(false);
-};
+      setIsListening(false);
+    };
 
     recognition.onerror = () => {
       setIsListening(false);
@@ -179,13 +122,18 @@ recognition.onresult = (event) => {
     recognition.onend = () => setIsListening(false);
   };
 
+  // ⏭️ Go to next word or exam page
   const nextWord = () => {
     setAttempts(0);
     if (currentIndex < words.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setMessage("");
     } else {
-      setMessage("🎉 All words completed!");
+      setMessage("🎉 You finished all words for this level! Great job!");
+      launchConfetti();
+      setTimeout(() => {
+        navigate("/chat-with-ai"); // ← صفحة الامتحان أو التقييم
+      }, 2500);
     }
   };
 
