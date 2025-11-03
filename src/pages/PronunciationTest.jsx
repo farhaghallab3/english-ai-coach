@@ -1,195 +1,71 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import confetti from "canvas-confetti";
+import React, { useState } from "react";
+import { speakText, startSpeechRecognition } from "../utils/speechUtils";
 
 const PronunciationTest = () => {
-  const [words, setWords] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [message, setMessage] = useState("");
-  const [attempts, setAttempts] = useState(0);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef(null);
-  const navigate = useNavigate();
+  const [spoken, setSpoken] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // 🎧 Fetch words from Django API
-  useEffect(() => {
-    fetch("https://farha31.pythonanywhere.com/api/words/")
-      .then((res) => res.json())
-      .then((data) => setWords(data))
-      .catch(() => setMessage("Error loading words ❌"));
-  }, []);
+  const expectedText = "How are you today? (كيف حالك اليوم؟)";
 
-  // 🔊 Speak the current word
-  const speakWord = () => {
-    if (!words[currentIndex]) return;
-    const utterance = new SpeechSynthesisUtterance(words[currentIndex].word);
-    utterance.lang = "en-US";
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    speechSynthesis.speak(utterance);
-  };
-
-  // 🎉 Launch confetti
-  const launchConfetti = () => {
-    const duration = 1.5 * 1000;
-    const end = Date.now() + duration;
-    (function frame() {
-      confetti({
-        particleCount: 4,
-        startVelocity: 30,
-        spread: 360,
-        ticks: 60,
-        origin: { x: Math.random(), y: Math.random() - 0.2 },
-      });
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    })();
-  };
-
-  // 🗣️ Encouragement messages
-  const encouragements = [
-    "Excellent! You nailed it!",
-    "Awesome! Keep it up!",
-    "Perfect pronunciation!",
-    "Well done! You’re improving fast!",
-    "Great job! That was clear and confident!",
-  ];
-
-  const playEncouragement = () => {
-    const randomMsg =
-      encouragements[Math.floor(Math.random() * encouragements.length)];
-    const utterance = new SpeechSynthesisUtterance(randomMsg);
-    utterance.lang = "en-US";
-    utterance.rate = 1;
-    utterance.pitch = 1.1;
-    speechSynthesis.speak(utterance);
-  };
-
-  // 🎤 Start recording
-  const startListening = () => {
-    if (!("webkitSpeechRecognition" in window)) {
-      setMessage("Speech recognition not supported ❌");
-      return;
-    }
-
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognitionRef.current = recognition;
-    recognition.continuous = false;
-
-    recognition.start();
-    setIsListening(true);
-    setMessage("🎤 Listening...");
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.toLowerCase().trim();
-      const correctWord = words[currentIndex].word.toLowerCase().trim();
-
-      const isMatch =
-        transcript === correctWord ||
-        transcript.includes(correctWord) ||
-        correctWord.includes(transcript);
-
-      if (isMatch) {
-        setMessage("✅ Excellent! Great job 🎉");
-        setAttempts(0);
-        playEncouragement();
-        launchConfetti();
-        setTimeout(nextWord, 2000);
-      } else {
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
-        if (newAttempts >= 3) {
-          setMessage("😅 Let's skip this one 👉");
-          speakWord();
-          setTimeout(nextWord, 2000);
-        } else {
-          setMessage(`❌ You said: "${transcript}". Try again 🔁`);
-        }
-      }
-
-      setIsListening(false);
-    };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-      setMessage("⚠️ Error, please try again.");
-    };
-
-    recognition.onend = () => setIsListening(false);
-  };
-
-  // ⏭️ Go to next word or exam page
-  const nextWord = () => {
-    setAttempts(0);
-    if (currentIndex < words.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-      setMessage("");
-    } else {
-      setMessage("🎉 You finished all words for this level! Great job!");
-      launchConfetti();
-      setTimeout(() => {
-        navigate("/chat-with-ai"); // ← صفحة الامتحان أو التقييم
-      }, 2500);
-    }
-  };
-
-  if (words.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-screen text-lg">
-        Loading words...
-      </div>
+  const handleSpeak = () => {
+    startSpeechRecognition(
+      expectedText,
+      (similarity, spokenText) => {
+        setSpoken(spokenText);
+        setProgress(similarity * 100); // show score %
+        setIsSpeaking(false);
+      },
+      (err) => console.error(err)
     );
-  }
-
-  const progress = ((currentIndex + 1) / words.length) * 100;
+    setIsSpeaking(true);
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-100 to-blue-100 p-6">
-      
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
-        <h1 className="text-2xl font-bold mb-4 text-green-600">
-          Pronunciation Practice 🗣️
-        </h1>
+    <div style={{ textAlign: "center" }}>
+      <h3>Example 1 of 5: {expectedText}</h3>
+      <button onClick={() => speakText(expectedText)}>▶️ Listen Example</button>
+      <button onClick={handleSpeak} disabled={isSpeaking}>
+        🎤 Speak
+      </button>
+      <p>You said: "{spoken}"</p>
 
-        <div className="text-4xl font-extrabold text-gray-800 mb-4">
-          {words[currentIndex].word}
-        </div>
-
-        <div className="flex justify-center space-x-6 mb-6">
-          <button
-            onClick={speakWord}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full shadow"
-          >
-            🔊 Listen
-          </button>
-          <button
-            onClick={startListening}
-            disabled={isListening}
-            className={`${
-              isListening ? "bg-gray-400" : "bg-green-500 hover:bg-green-600"
-            } text-white px-4 py-2 rounded-full shadow`}
-          >
-            🎤 {isListening ? "Listening..." : "Speak"}
-          </button>
-        </div>
-
-        <p className="text-lg mb-4">{message}</p>
-
-        <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-          <div
-            className="bg-green-500 h-3 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-
-        <p className="text-sm text-gray-600">
-          Progress: {currentIndex + 1}/{words.length}
-        </p>
+      {/* ✅ Progress bar */}
+      <div
+        style={{
+          width: "80%",
+          height: "15px",
+          background: "#ddd",
+          borderRadius: "10px",
+          margin: "10px auto",
+        }}
+      >
+        <div
+          style={{
+            width: `${progress}%`,
+            height: "100%",
+            borderRadius: "10px",
+            background:
+              progress >= 85
+                ? "#4caf50"
+                : progress >= 60
+                ? "#ffb400"
+                : "#f44336",
+            transition: "width 0.5s ease",
+          }}
+        ></div>
       </div>
+
+      {/* ✅ Feedback message */}
+      {progress > 0 && (
+        <p>
+          {progress >= 85
+            ? "✅ Great pronunciation!"
+            : progress >= 60
+            ? "👍 Almost there!"
+            : "🗣 Keep practicing!"}
+        </p>
+      )}
     </div>
   );
 };

@@ -1,6 +1,8 @@
+// src/pages/PronunciationPractice.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
+import WordPractice from "../../components/WordPractice";
 
 const BASE_URL = "https://farha31.pythonanywhere.com/api";
 
@@ -9,13 +11,10 @@ const PronunciationPractice = () => {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [words, setWords] = useState([]);
   const [selectedWord, setSelectedWord] = useState(null);
-  const [currentExample, setCurrentExample] = useState(0);
-  const [feedback, setFeedback] = useState("");
   const [completedWords, setCompletedWords] = useState(
     JSON.parse(localStorage.getItem("completedWords")) || []
   );
 
-  // fetch words for selected level
   useEffect(() => {
     if (selectedLevel) {
       axios
@@ -25,96 +24,19 @@ const PronunciationPractice = () => {
     }
   }, [selectedLevel]);
 
-// play pronunciation audio
-const speak = (text) => {
-  // remove punctuation before speaking so it won’t say “dot”
-  const cleanText = text.replace(/[.,!?]/g, "");
-  const utterance = new SpeechSynthesisUtterance(cleanText);
-  utterance.lang = "en-US";
-  speechSynthesis.speak(utterance);
-};
-
-// normalize text for comparison
-const normalize = (text) => {
-  return text
-    .toLowerCase()
-    // remove spoken punctuation words
-    .replace(/\b(dot|comma|period|question mark|exclamation mark|full stop)\b/gi, "")
-    // remove actual punctuation
-    .replace(/[.,!?]/g, "")
-    // collapse multiple spaces
-    .replace(/\s+/g, " ")
-    .trim();
-};
-
-
-  // start recording and compare spoken text
-  const startRecording = (expectedText) => {
-    const recognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!recognition) {
-      alert("Speech recognition not supported in this browser.");
-      return;
-    }
-
-    const recog = new recognition();
-    recog.lang = "en-US";
-    recog.start();
-
-    recog.onresult = (event) => {
-      const spokenRaw = event.results[0][0].transcript;
-      const spoken = normalize(spokenRaw);
-      const expected = normalize(expectedText);
-
-      console.log("Spoken:", spoken);
-      console.log("Expected:", expected);
-
-      if (spoken === expected || spoken.includes(expected)) {
-        setFeedback("✅ Great job!");
-        setTimeout(() => nextExample(), 1000);
-      } else {
-        setFeedback("❌ Try again!");
-      }
-    };
-
-    recog.onerror = (e) => {
-      console.error("Speech recognition error:", e);
-      setFeedback("⚠️ Could not recognize speech. Please try again.");
-    };
-  };
-
-  // go to next example or finish word
-  const nextExample = () => {
-    const examples = getExamples(selectedWord);
-    if (currentExample < examples.length - 1) {
-      setCurrentExample((prev) => prev + 1);
-      setFeedback("");
-    } else {
-      const updated = [...completedWords, selectedWord.word];
-      setCompletedWords(updated);
-      localStorage.setItem("completedWords", JSON.stringify(updated));
-      alert(`🎉 You finished practicing "${selectedWord.word}"!`);
-      setSelectedWord(null);
-      setCurrentExample(0);
-      setFeedback("");
-    }
-  };
-
-  const getExamples = (word) => {
-    return [
-      word.example1,
-      word.example2,
-      word.example3,
-      word.example4,
-      word.example5,
-    ].filter(Boolean);
+  const handleCompleteWord = (word) => {
+    const updated = [...completedWords, word];
+    setCompletedWords(updated);
+    localStorage.setItem("completedWords", JSON.stringify(updated));
+    alert(`🎉 You finished practicing "${word}"!`);
+    setSelectedWord(null);
   };
 
   return (
     <>
       <Navbar />
       <div className="p-16 text-center">
-        {/* LEVEL SELECTION */}
+        {/* Level Selection */}
         {!selectedLevel && !selectedWord && (
           <>
             <h1 className="text-2xl font-bold mb-6">🎯 Choose Your Level</h1>
@@ -132,7 +54,7 @@ const normalize = (text) => {
           </>
         )}
 
-        {/* WORD LIST */}
+        {/* Word List */}
         {selectedLevel && !selectedWord && (
           <>
             <button
@@ -162,73 +84,13 @@ const normalize = (text) => {
           </>
         )}
 
-        {/* WORD PRACTICE */}
+        {/* Word Practice */}
         {selectedWord && (
-          <div className="max-w-lg mx-auto">
-            <button
-              onClick={() => setSelectedWord(null)}
-              className="mb-4 text-blue-600 underline"
-            >
-              ← Back to {selectedLevel} Words
-            </button>
-
-            <h2 className="text-2xl font-bold mb-2">{selectedWord.word}</h2>
-            <p className="text-gray-700 mb-4">{selectedWord.meaning}</p>
-
-            <button
-              onClick={() => speak(selectedWord.word)}
-              className="mb-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-            >
-              🔊 Listen to "{selectedWord.word}"
-            </button>
-
-            <h3 className="text-lg font-semibold mb-2">Examples:</h3>
-
-            {getExamples(selectedWord).length > 0 ? (
-              <>
-                <p className="text-gray-800 mb-4">
-                  Example {currentExample + 1} of{" "}
-                  {getExamples(selectedWord).length}:{" "}
-                  <strong>{getExamples(selectedWord)[currentExample]}</strong>
-                </p>
-
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={() =>
-                      speak(getExamples(selectedWord)[currentExample])
-                    }
-                    className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600"
-                  >
-                    ▶️ Listen Example
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      startRecording(
-                        getExamples(selectedWord)[currentExample]
-                      )
-                    }
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                  >
-                    🎤 Speak
-                  </button>
-
-                  <button
-                    onClick={nextExample}
-                    className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
-                  >
-                    ⏭ Skip
-                  </button>
-                </div>
-
-                <p className="mt-4 text-lg font-semibold text-center">
-                  {feedback}
-                </p>
-              </>
-            ) : (
-              <p>No examples available for this word.</p>
-            )}
-          </div>
+          <WordPractice
+            wordData={selectedWord}
+            onComplete={handleCompleteWord}
+            onBack={() => setSelectedWord(null)}
+          />
         )}
       </div>
     </>
