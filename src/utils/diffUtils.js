@@ -1,22 +1,12 @@
-import { diffWords } from "diff";
+// src/utils/diffUtils.js
+export function showMistake(expected, actual) {
+  const expectedWords = expected.toLowerCase().split(" ");
+  const actualWords = actual.toLowerCase().split(" ");
 
-/**
- * Compare the correct and spoken sentences and highlight mistakes.
- */
-export const showMistake = (correctSentence, userSentence) => {
-  const differences = diffWords(
-    correctSentence.toLowerCase(),
-    userSentence.toLowerCase()
-  );
-
-  let feedback = "";
-  differences.forEach((part) => {
-    if (part.added) {
-      feedback += `❌ You added "${part.value.trim()}" `;
-    } else if (part.removed) {
-      feedback += `❌ You missed "${part.value.trim()}" `;
-    }
+  const feedback = expectedWords.map((word, i) => {
+    if (actualWords[i] === word) return `✅ ${word}`;
+    return `❌ ${word}`;
   });
 
-  return feedback || "✅ Perfect!";
-};
+  return feedback.join(" ");
+}

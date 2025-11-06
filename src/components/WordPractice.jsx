@@ -1,12 +1,32 @@
 import React, { useState } from "react";
-import { speakText, startSpeechRecognition } from "../utils/speechUtils";
-import { showMistake } from "../utils/diffUtils";
-import { getAiExplanation } from "../utils/aiHelper";
+import { recordAudio } from "../utils/speechUtils";
+
+const encouragementMessages = [
+  "Great job! Keep it up!",
+  "You're doing amazing!",
+  "Keep practicing and you'll improve fast!",
+  "Excellent work, let's move on!",
+  "Nice effort! Try the next one!",
+  "You're on fire! Keep going!",
+];
+
+const getRandomEncouragement = () => {
+  return encouragementMessages[
+    Math.floor(Math.random() * encouragementMessages.length)
+  ];
+};
+
+// Remove all punctuation from speech strings to avoid saying 'dot' etc
+const removePunctuation = (text) => {
+  return text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+};
 
 const WordPractice = ({ wordData, onComplete, onBack }) => {
   const [currentExample, setCurrentExample] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [progress, setProgress] = useState(0);
+  const [correctWords, setCorrectWords] = useState(0);
+  const [totalWords, setTotalWords] = useState(0);
   const [isListening, setIsListening] = useState(false);
 
   const examples = [
@@ -17,120 +37,150 @@ const WordPractice = ({ wordData, onComplete, onBack }) => {
     wordData.example5,
   ].filter(Boolean);
 
+  const filterEnglishOnly = (text) => {
+    if (!text) return "";
+    let filtered = text.replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g, "");
+    filtered = filtered.replace(/[^a-zA-Z\s]/g, "");
+    return filtered.replace(/\s+/g, " ").trim();
+  };
+
+  const speakTextWithPause = (intro, sentence) => {
+    if (!sentence) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const cleanIntro = removePunctuation(intro);
+    const cleanSentence = removePunctuation(sentence);
+    const utterIntro = new SpeechSynthesisUtterance(cleanIntro);
+    const utterPause = new SpeechSynthesisUtterance(" ");
+    utterPause.rate = 0.1; // slow pause for about 1 second
+    const utterSentence = new SpeechSynthesisUtterance(cleanSentence);
+    utterSentence.lang = "en-US";
+    utterIntro.lang = "en-US";
+    utterPause.lang = "en-US";
+
+    utterIntro.onend = () => synth.speak(utterPause);
+    utterPause.onend = () => synth.speak(utterSentence);
+
+    synth.speak(utterIntro);
+  };
+
+  const speakText = (text) => {
+    if (!text) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const cleanText = removePunctuation(text);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "en-US";
+    synth.speak(utterance);
+  };
+
   const nextExample = () => {
     if (currentExample < examples.length - 1) {
       setCurrentExample((prev) => prev + 1);
       setFeedback("");
       setProgress(0);
+      setCorrectWords(0);
+      setTotalWords(0);
     } else {
-      setFeedback("");
       onComplete(wordData.word);
     }
   };
 
-  const handleSpeak = () => {
-    if (isListening) return;
-    setIsListening(true);
+  const handleSpeak = async () => {
+    try {
+      setIsListening(true);
+      setFeedback("🎙️ Recording... Speak now!");
+      const audioBlob = await recordAudio(3);
+      setFeedback("⏳ Transcribing...");
 
-    const example = examples[currentExample];
+      const formData = new FormData();
+      formData.append("file", audioBlob);
+      formData.append("example", examples[currentExample]);
 
-    startSpeechRecognition(
-      example,
-      (similarity, spoken) => {
-        setIsListening(false);
-        const percent = Math.round(similarity * 100);
-        setProgress(percent);
-
-        if (percent >= 90) {
-          setFeedback("✅ Great job! Perfect pronunciation!");
-          setTimeout(nextExample, 1000);
-        } else {
-          const mistakeFeedback = showMistake(example, spoken);
-          setFeedback(`🟡 ${percent}% match.\n${mistakeFeedback}`);
-
-          // Ask AI to explain mistakes
-          getAiExplanation(example, spoken).then((aiMessage) => {
-            setFeedback(
-              (prev) => `${prev}\n💬 AI Coach: ${aiMessage}`
-            );
-          });
+      const response = await fetch(
+        "https://farha31.pythonanywhere.com/api/transcribe/",
+        {
+          method: "POST",
+          body: formData,
         }
-      },
-      (error) => {
-        setIsListening(false);
-        console.error("Speech recognition error:", error);
-        setFeedback("⚠️ Could not recognize speech. Please try again.");
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Server error");
       }
-    );
+
+      const percent = result.progress || 0;
+      const targetSentence = examples[currentExample];
+
+      setProgress(percent);
+
+      if (percent >= 50) {
+        const encouragement = getRandomEncouragement();
+        setFeedback(encouragement);
+        speakText(encouragement);
+        setTimeout(nextExample, 1500);
+      } else {
+        const trySayText = "Try saying:";
+        setFeedback(`${trySayText} ${targetSentence}`);
+        speakTextWithPause(trySayText, filterEnglishOnly(targetSentence));
+      }
+    } catch (err) {
+      console.error(err);
+      setFeedback("⚠️ Error processing your speech. Try again.");
+    } finally {
+      setIsListening(false);
+    }
   };
 
   return (
-    <div className="max-w-lg mx-auto">
-      <button onClick={onBack} className="mb-4 text-blue-600 underline">
-        ← Back to Words
+    <div className="max-w-lg mx-auto text-center">
+      <button onClick={onBack} className="text-blue-600 underline mb-4">
+        ← Back
       </button>
 
       <h2 className="text-2xl font-bold mb-2">{wordData.word}</h2>
       <p className="text-gray-700 mb-4">{wordData.meaning}</p>
 
+      <h3 className="text-lg font-semibold mb-2">
+        Example {currentExample + 1} of {examples.length}{" "}
+        <button
+          onClick={() => speakText(examples[currentExample])}
+          title="Hear example sentence"
+          className="ml-2 text-xl"
+          aria-label="Play example sentence"
+        >
+          🔊
+        </button>
+      </h3>
+      <p className="text-gray-800 mb-4">{examples[currentExample]}</p>
+
+      <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
+        <div
+          className="bg-green-500 h-4 rounded-full transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+
       <button
-        onClick={() => speakText(wordData.word)}
-        className="mb-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+        onClick={handleSpeak}
+        disabled={isListening}
+        className={`px-6 py-3 rounded-lg text-white ${
+          isListening ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
+        }`}
       >
-        🔊 Listen to "{wordData.word}"
+        {isListening ? "🎧 Listening..." : "🎤 Speak"}
       </button>
 
-      {examples.length > 0 ? (
-        <>
-          <h3 className="text-lg font-semibold mb-2">Examples:</h3>
-          <p className="text-gray-800 mb-4">
-            Example {currentExample + 1} of {examples.length}:{" "}
-            <strong>{examples[currentExample]}</strong>
-          </p>
+      <button
+        onClick={nextExample}
+        className="ml-3 bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500"
+      >
+        ⏭ Skip
+      </button>
 
-          {/* ✅ Progress Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-            <div
-              className="bg-green-500 h-4 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => speakText(examples[currentExample])}
-              className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600"
-            >
-              ▶️ Listen Example
-            </button>
-
-            <button
-              onClick={handleSpeak}
-              disabled={isListening}
-              className={`px-4 py-2 rounded-lg text-white ${
-                isListening
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-500 hover:bg-green-600"
-              }`}
-            >
-              {isListening ? "🎙️ Listening..." : "🎤 Speak"}
-            </button>
-
-            <button
-              onClick={nextExample}
-              className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
-            >
-              ⏭ Skip
-            </button>
-          </div>
-
-          <p className="mt-4 text-lg font-semibold text-center whitespace-pre-line">
-            {feedback}
-          </p>
-        </>
-      ) : (
-        <p>No examples available for this word.</p>
-      )}
+      <p className="mt-6 text-lg font-medium whitespace-pre-line">{feedback}</p>
     </div>
   );
 };

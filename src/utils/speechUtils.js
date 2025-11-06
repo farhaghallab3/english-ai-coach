@@ -1,64 +1,26 @@
 // src/utils/speechUtils.js
-import stringSimilarity from "string-similarity";
 
-// ✅ Speak text aloud (without saying "dot" or punctuation)
-export const speakText = (text) => {
-  const cleanText = text.replace(/[.,!?]/g, "");
-  const utterance = new SpeechSynthesisUtterance(cleanText);
-  utterance.lang = "en-US";
-  speechSynthesis.speak(utterance);
-};
-
-// ✅ Normalize text for better comparison
-export const normalizeText = (text) => {
-  return text
-    .toLowerCase()
-    .replace(/\(.*?\)/g, "") // 🧠 remove Arabic or anything inside parentheses
-    .replace(/[.,!?]/g, "")  // 🧹 remove punctuation
-    .replace(/\b(dot|comma|period|question mark|exclamation mark|full stop)\b/gi, "") // remove spoken punctuation
-    .replace(/\s+/g, " ") // normalize spaces
-    .trim();
-};
-
-
-// ✅ Start voice recognition and return similarity score
-export const startSpeechRecognition = (expectedText, onResult, onError) => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    alert("Speech recognition not supported in this browser.");
-    return;
+export async function recordAudio(duration = 3) {
+  // Check browser support
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("Your browser doesn't support audio recording.");
+    return null;
   }
 
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.continuous = false;
-  recognition.interimResults = false;
+  // Ask for mic permission
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const mediaRecorder = new MediaRecorder(stream);
+  const chunks = [];
 
-  recognition.onresult = (event) => {
-    const spokenRaw = event.results[0][0].transcript;
-    const spoken = normalizeText(spokenRaw);
-    const expected = normalizeText(expectedText);
+  return new Promise((resolve) => {
+    mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
 
-    const similarity = stringSimilarity.compareTwoStrings(spoken, expected);
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(chunks, { type: "audio/webm" });
+      resolve(audioBlob);
+    };
 
-    console.log("Spoken:", spoken);
-    console.log("Expected:", expected);
-    console.log("Similarity:", similarity);
-
-    onResult(similarity, spoken);
-  };
-
-  recognition.onerror = (e) => {
-    if (e.error === "no-speech") {
-      onError("🎙️ No speech detected. Please try again.");
-    } else if (e.error === "aborted") {
-      onError("⚠️ Listening was stopped early.");
-    } else {
-      onError("Speech recognition error: " + e.error);
-    }
-  };
-
-  recognition.start();
-};
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), duration * 1000);
+  });
+}
