@@ -9,8 +9,9 @@ import SpeechToText from "./pages/STT/SpeechToText";
 import ChatWithAI from "./pages/Chat/ChatWithAI";
 import ChatWithWordsAI from "./pages/Chat/ChatWithWordsAI";
 import PronunciationPractice from "./pages/Practice/PronunciationPractice";
+import Levels from "./pages/Levels";
+import StudentDashboard from "./pages/Dashboard/StudentDashboard";
 // import PronunciationTest from "./pages/PronunciationTest"
-// import Levels from "./pages/Levels";
 // import LevelsPage from "./pages/Practice/LevelsPage";
 
 // import PaymentPage from "./pages/Payment/PaymentPage";
@@ -26,12 +27,14 @@ function App() {
         <Route path="/tts" element={<TextToSpeech />} />
         <Route path="/stt" element={<SpeechToText />} />
         <Route path="/chat" element={<ChatWithAI />} />
+        <Route path="/dashboard" element={<StudentDashboard />} />
       {/* <Route path="/practice/:id" element={<PronunciationPractice />} /> */}
        {/* <Route path="/level" element={<Levels/>} /> */}
       <Route path = "/chat-words-ai" element = {<ChatWithWordsAI/>} />
         {/* <Route path="/payment" element={<PaymentPage />} /> */}
 {/* <Route path="/practice" element={<LevelsPage />} /> */}
 <Route path="/practice" element={<PronunciationPractice />} />
+<Route path="/levels" element={<Levels />} />
 {/* <Route path="/PronunciationTest" element={<PronunciationTest />}/> */}
 
 

@@ -8,7 +8,7 @@ export default function Levels() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://farha31.pythonanywhere.com/api";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://ownback-production.up.railway.app/api";
   const token = localStorage.getItem("token");
 
   useEffect(() => {

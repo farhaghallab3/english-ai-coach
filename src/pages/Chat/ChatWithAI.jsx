@@ -121,61 +121,61 @@ const ChatWithAI = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex flex-col items-center justify-center flex-grow px-4 py-8">
-        <div className="w-full max-w-3xl glass-card shadow-2xl overflow-hidden">
-          <div className="bg-gradient-animated text-white text-center py-6 text-2xl font-bold flex items-center justify-center gap-3">
-            <FaRobot className="text-2xl" />
+      <div className="flex flex-col items-center justify-center flex-grow px-2 md:px-4 py-4 md:py-8">
+        <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl glass-card shadow-2xl overflow-hidden">
+          <div className="bg-gradient-animated text-white text-center py-4 md:py-6 text-lg md:text-2xl font-bold flex items-center justify-center gap-2 md:gap-3">
+            <FaRobot className="text-lg md:text-2xl" />
             AI Chat Tutor
-            <FaRobot className="text-2xl" />
+            <FaRobot className="text-lg md:text-2xl" />
           </div>
 
           {/* Chat Messages */}
-          <div className="h-[70vh] overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
+          <div className="h-96 md:h-[70vh] overflow-y-auto p-4 md:p-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
             {messages.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
-                <FaRobot className="text-6xl mx-auto mb-4 opacity-50" />
-                <p className="text-xl">Start a conversation with your AI tutor!</p>
-                <p className="text-sm mt-2">Ask questions, practice pronunciation, or just chat in English.</p>
+              <div className="text-center text-gray-400 py-8 md:py-12">
+                <FaRobot className="text-4xl md:text-6xl mx-auto mb-4 opacity-50" />
+                <p className="text-base md:text-xl">Start a conversation with your AI tutor!</p>
+                <p className="text-xs md:text-sm mt-2">Ask questions, practice pronunciation, or just chat in English.</p>
               </div>
             )}
 
             {messages.map((msg, i) => (
               <div
                 key={i}
-                className={`flex items-start gap-3 ${
+                className={`flex items-start gap-2 md:gap-3 ${
                   msg.sender === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 {msg.sender === "bot" && (
-                  <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-full flex items-center justify-center shadow-lg">
-                    <FaRobot className="text-white text-sm" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-full flex items-center justify-center shadow-lg">
+                    <FaRobot className="text-white text-xs md:text-sm" />
                   </div>
                 )}
 
                 <div
-                  className={`relative px-6 py-4 rounded-2xl max-w-[75%] shadow-lg ${
+                  className={`relative px-4 md:px-6 py-3 md:py-4 rounded-2xl max-w-[85%] md:max-w-[75%] shadow-lg ${
                     msg.sender === "user"
                       ? "bg-gradient-to-r from-cyan-400 to-violet-500 text-white rounded-br-sm"
                       : "glass-card text-black rounded-bl-sm"
                   }`}
                 >
-                  <p className="leading-relaxed">{msg.text}</p>
+                  <p className="leading-relaxed text-sm md:text-base">{msg.text}</p>
 
                   {/* Audio button for bot messages */}
                   {msg.sender === "bot" && (
                     <button
                       onClick={() => speak(msg.text)}
-                      className="absolute -right-3 -top-3 w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg"
+                      className="absolute -right-2 md:-right-3 -top-2 md:-top-3 w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg"
                       title="Listen to response"
                     >
-                      <FaVolumeUp size={12} />
+                      <FaVolumeUp size={10} className="md:w-3 md:h-3" />
                     </button>
                   )}
                 </div>
 
                 {msg.sender === "user" && (
-                  <div className="w-10 h-10 bg-gradient-to-r from-violet-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                    <FaUserAlt className="text-white text-sm" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-violet-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                    <FaUserAlt className="text-white text-xs md:text-sm" />
                   </div>
                 )}
               </div>
@@ -183,17 +183,17 @@ const ChatWithAI = () => {
           </div>
 
           {/* Input Section */}
-          <div className="flex items-center border-t border-slate-700 glass-card p-4 gap-3">
+          <div className="flex items-center border-t border-slate-700 glass-card p-3 md:p-4 gap-2 md:gap-3">
             <button
               onClick={toggleMic}
-              className={`p-4 rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${
+              className={`p-3 md:p-4 rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${
                 isListening
                   ? "bg-red-500 animate-pulse text-white"
                   : "btn-primary hover:shadow-xl"
               }`}
               title={isListening ? "Listening..." : "Voice input"}
             >
-              <FaMicrophone size={20} />
+              <FaMicrophone size={16} className="md:w-5 md:h-5" />
             </button>
 
             <input
@@ -201,15 +201,15 @@ const ChatWithAI = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
               placeholder="Type your message or use voice input..."
-              className="input-field flex-1 text-lg"
+              className="input-field flex-1 text-base md:text-lg"
             />
 
             <button
               onClick={() => handleSend(input)}
-              className="btn-primary p-4 rounded-2xl hover:scale-105 transition-transform shadow-lg"
+              className="btn-primary p-3 md:p-4 rounded-2xl hover:scale-105 transition-transform shadow-lg"
               title="Send message"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </button>
@@ -217,7 +217,7 @@ const ChatWithAI = () => {
         </div>
 
         {/* Tips */}
-        <div className="mt-6 max-w-2xl">
+        <div className="mt-4 md:mt-6 w-full max-w-xs sm:max-w-md md:max-w-2xl">
           <div className="glass-card p-4 text-center">
             <p className="text-gray-300 text-sm">
               💡 <strong>Tips:</strong> Ask about grammar, vocabulary, pronunciation, or practice conversations. Your AI tutor is here to help you learn!
