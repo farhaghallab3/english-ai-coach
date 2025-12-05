@@ -92,7 +92,7 @@ const ChatWithAI = () => {
   user_id: localStorage.getItem("user_id"),
 });
 
-      const res = await fetch("http://127.0.0.1:8000/api/ask-ai-basic/", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "https://ownback-production.up.railway.app/api"}/ask-ai-basic/`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({

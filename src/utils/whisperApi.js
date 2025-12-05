@@ -4,7 +4,7 @@ export async function transcribeAudio(audioBlob, exampleText) {
   formData.append("file", audioBlob, "recording.wav");
   formData.append("example", exampleText);
 
-  const res = await fetch("http://127.0.0.1:8000/api/transcribe/", {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "https://ownback-production.up.railway.app/api"}/transcribe/`, {
     method: "POST",
     body: formData,
   });

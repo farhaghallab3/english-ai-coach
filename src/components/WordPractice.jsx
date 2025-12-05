@@ -99,7 +99,7 @@ const WordPractice = ({ wordData, onComplete, onBack }) => {
       formData.append("example", examples[currentExample]);
 
       const response = await fetch(
-        "http://127.0.0.1:8000/api/transcribe/",
+        `${import.meta.env.VITE_API_BASE_URL || "https://ownback-production.up.railway.app/api"}/transcribe/`,
         {
           method: "POST",
           body: formData,
