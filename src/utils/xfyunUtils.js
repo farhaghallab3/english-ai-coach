@@ -1,6 +1,6 @@
 export const startIseEvaluation = async (textToRead) => {
   try {
-    const res = await fetch("https://farha31.pythonanywhere.com/api/get-ise-auth/");
+    const res = await fetch("http://127.0.0.1:8000/api/get-ise-auth/");
     const { wsUrl, app_id } = await res.json();
 
     const ws = new WebSocket(wsUrl);

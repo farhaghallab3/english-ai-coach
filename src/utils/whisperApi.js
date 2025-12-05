@@ -4,7 +4,7 @@ export async function transcribeAudio(audioBlob, exampleText) {
   formData.append("file", audioBlob, "recording.wav");
   formData.append("example", exampleText);
 
-  const res = await fetch("https://farha31.pythonanywhere.com/api/transcribe/", {
+  const res = await fetch("http://127.0.0.1:8000/api/transcribe/", {
     method: "POST",
     body: formData,
   });

@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { FaUser, FaLock, FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://farha31.pythonanywhere.com/api";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
 
   const { login } = useAuth();
   const handleLogin = async () => {
@@ -21,7 +22,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/login/`, {
+      const res = await fetch(`${API_BASE}/auth/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: username.trim(), password }),
@@ -75,72 +76,149 @@ window.dispatchEvent(new Event("userUpdated"));
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8"
-      >
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-indigo-600">
-          Welcome Back 👋
-        </h2>
+    <div className="flex flex-col min-h-screen">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-cyan-400/5 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-32 right-16 w-40 h-40 bg-violet-400/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-amber-400/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
 
-        <div className="space-y-4">
-          <div>
-  <label className="block text-gray-600 mb-1">Email</label>
-  <input
-    type="email"
-    className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition"
-    placeholder="Enter your name"
-    value={username}
-    onChange={(e) => setUsername(e.target.value)}
-  />
-</div>
-
-
-          <div>
-            <label className="block text-gray-600 mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+      <div className="flex-grow flex flex-col items-center justify-center px-4 py-8 relative z-10">
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                <FaSignInAlt />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black text-gradient">
+                Welcome Back
+              </h1>
+            </div>
+            <p className="text-gray-300 text-lg">
+              Continue your English learning journey
+            </p>
           </div>
 
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={handleLogin}
-            disabled={loading}
-            className={`w-full py-3 rounded-lg font-semibold flex justify-center items-center gap-2 transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
-          >
-            {loading ? (
-              <>
-                <span className="loader border-t-transparent border-white w-5 h-5 rounded-full border-2 animate-spin"></span>
-                Logging in...
-              </>
-            ) : (
-              "Login"
-            )}
-          </motion.button>
+          {/* Login Form */}
+          <div className="glass-card p-8 scale-in">
+            <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-6">
+              {/* Email Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <FaUser className="text-cyan-400" />
+                  Email Address
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    className="input-field w-full pl-4 pr-4"
+                    placeholder="Enter your email"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-          <p className="text-center text-sm text-gray-500 mt-4">
-            Don’t have an account?{" "}
-            <span
-              onClick={() => navigate("/signup")}
-              className="text-purple-600 hover:underline cursor-pointer"
-            >
-              Sign Up
-            </span>
-          </p>
+              {/* Password Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <FaLock className="text-violet-400" />
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="input-field w-full pl-4 pr-12"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className={`btn-primary w-full text-lg py-4 btn-hover-lift flex items-center justify-center gap-3 ${
+                  loading ? 'opacity-75 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Signing you in...
+                  </>
+                ) : (
+                  <>
+                    <FaSignInAlt />
+                    Login to Your Account
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center my-6">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
+              <span className="px-3 text-sm text-gray-400">or</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
+            </div>
+
+            {/* Sign Up Link */}
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">
+                New to Own Language?{" "}
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors hover:underline"
+                >
+                  Create your account
+                </button>
+              </p>
+            </div>
+
+            {/* Features Preview */}
+            <div className="mt-8 p-4 glass-card">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-full flex items-center justify-center text-sm">
+                  🚀
+                </div>
+                <span className="text-white font-semibold">What awaits you:</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+                  <span>AI Chat Tutor</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
+                  <span>Voice Practice</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+                  <span>Progress Tracking</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                  <span>Personalized Learning</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

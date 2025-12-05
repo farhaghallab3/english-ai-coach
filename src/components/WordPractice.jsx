@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaMicrophone, FaVolumeUp, FaArrowLeft, FaCheckCircle, FaPlay, FaForward, FaTrophy } from "react-icons/fa";
 import { recordAudio } from "../utils/speechUtils";
 
 const encouragementMessages = [
@@ -98,7 +99,7 @@ const WordPractice = ({ wordData, onComplete, onBack }) => {
       formData.append("example", examples[currentExample]);
 
       const response = await fetch(
-        "https://farha31.pythonanywhere.com/api/transcribe/",
+        "http://127.0.0.1:8000/api/transcribe/",
         {
           method: "POST",
           body: formData,
@@ -135,52 +136,155 @@ const WordPractice = ({ wordData, onComplete, onBack }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto text-center">
-      <button onClick={onBack} className="text-blue-600 underline mb-4">
-        ← Back
-      </button>
-
-      <h2 className="text-2xl font-bold mb-2">{wordData.word}</h2>
-      <p className="text-gray-700 mb-4">{wordData.meaning}</p>
-
-      <h3 className="text-lg font-semibold mb-2">
-        Example {currentExample + 1} of {examples.length}{" "}
-        <button
-          onClick={() => speakText(examples[currentExample])}
-          title="Hear example sentence"
-          className="ml-2 text-xl"
-          aria-label="Play example sentence"
-        >
-          🔊
-        </button>
-      </h3>
-      <p className="text-gray-800 mb-4">{examples[currentExample]}</p>
-
-      <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-        <div
-          className="bg-green-500 h-4 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        ></div>
+    <div className="max-w-4xl mx-auto scale-in relative">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 right-10 w-20 h-20 bg-cyan-400/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-10 w-16 h-16 bg-violet-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <button
-        onClick={handleSpeak}
-        disabled={isListening}
-        className={`px-6 py-3 rounded-lg text-white ${
-          isListening ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
-        }`}
-      >
-        {isListening ? "🎧 Listening..." : "🎤 Speak"}
-      </button>
+      <div className="glass-card p-8 md:p-12 relative z-10">
+        {/* Header with back button */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={onBack}
+            className="btn-secondary flex items-center gap-2 hover:bg-slate-600"
+          >
+            <FaArrowLeft />
+            Back to Words
+          </button>
+          <div className="text-sm text-gray-400">
+            Example {currentExample + 1} of {examples.length}
+          </div>
+        </div>
 
-      <button
-        onClick={nextExample}
-        className="ml-3 bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500"
-      >
-        ⏭ Skip
-      </button>
+        {/* Word Display */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+              {wordData.word.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 className="text-4xl md:text-6xl font-black text-gradient mb-2">
+                {wordData.word}
+              </h1>
+              <p className="text-gray-300 text-lg">{wordData.meaning}</p>
+            </div>
+          </div>
+        </div>
 
-      <p className="mt-6 text-lg font-medium whitespace-pre-line">{feedback}</p>
+        {/* Example Sentence */}
+        <div className="glass-card p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">Practice Sentence</h3>
+            <button
+              onClick={() => speakText(examples[currentExample])}
+              className="btn-primary p-3 rounded-xl hover:scale-105 transition-transform"
+              title="Listen to example"
+            >
+              <FaVolumeUp />
+            </button>
+          </div>
+          <p className="text-gray-200 text-lg leading-relaxed italic">
+            "{examples[currentExample]}"
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-300">Your Progress</span>
+            <span className="text-sm text-gray-400">{progress}%</span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-cyan-400 via-violet-500 to-amber-500 h-4 rounded-full transition-all duration-700 ease-out relative"
+              style={{ width: `${progress}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            </div>
+          </div>
+          {progress >= 50 && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-green-400">
+              <FaCheckCircle />
+              <span className="text-sm font-medium">Great progress! Keep going!</span>
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          <button
+            onClick={handleSpeak}
+            disabled={isListening}
+            className={`btn-primary text-lg px-8 py-4 btn-hover-lift flex items-center gap-3 relative ${
+              isListening ? 'bg-gradient-to-r from-amber-400 to-orange-500 animate-pulse' : ''
+            }`}
+          >
+            {isListening ? (
+              <>
+                <FaMicrophone className="animate-pulse" />
+                <span>Listening...</span>
+                <div className="absolute inset-0 rounded-2xl bg-red-500/20 animate-ping"></div>
+              </>
+            ) : (
+              <>
+                <FaMicrophone />
+                <span>Start Speaking</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={nextExample}
+            className="btn-secondary text-lg px-6 py-4 hover:bg-slate-600 flex items-center gap-2"
+          >
+            <FaForward />
+            Skip to Next
+          </button>
+        </div>
+
+        {/* Feedback Display */}
+        {feedback && (
+          <div className={`p-6 rounded-2xl text-center transition-all duration-500 ${
+            feedback.includes('Great') || feedback.includes('Excellent') || feedback.includes('Amazing')
+              ? 'bg-green-500/10 border border-green-500/30 text-green-300'
+              : feedback.includes('Try') || feedback.includes('Error')
+              ? 'bg-amber-500/10 border border-amber-500/30 text-amber-300'
+              : 'bg-blue-500/10 border border-blue-500/30 text-blue-300'
+          }`}>
+            <div className="flex items-center justify-center gap-3 mb-2">
+              {feedback.includes('Great') || feedback.includes('Excellent') ? (
+                <FaTrophy className="text-green-400" />
+              ) : feedback.includes('Recording') ? (
+                <FaMicrophone className="text-amber-400 animate-pulse" />
+              ) : (
+                <FaVolumeUp className="text-blue-400" />
+              )}
+              <span className="font-semibold">AI Feedback</span>
+            </div>
+            <p className="text-lg leading-relaxed">{feedback}</p>
+          </div>
+        )}
+
+        {/* Tips */}
+        <div className="mt-8 p-4 glass-card">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-violet-400 to-pink-500 rounded-full flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
+              💡
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-2">Practice Tips:</h4>
+              <ul className="text-gray-300 text-sm space-y-1">
+                <li>• Speak clearly and at a natural pace</li>
+                <li>• Focus on the pronunciation of the target word</li>
+                <li>• Listen to the example first, then repeat</li>
+                <li>• Aim for at least 50% accuracy to proceed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

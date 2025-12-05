@@ -4,7 +4,7 @@ import { speakText } from "./speechUtils";
 // ✅ Main AI explanation function
 export const getAiExplanation = async (correct, spoken) => {
   try {
-  const res = await fetch("https://farha31.pythonanywhere.com/api/explain-pronunciation/", {
+  const res = await fetch("http://127.0.0.1:8000/api/explain-pronunciation/", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
