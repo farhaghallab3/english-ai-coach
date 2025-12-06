@@ -7,12 +7,13 @@ import { MdDashboard } from "react-icons/md";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [userName, setUserName] = useState(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const navigate = useNavigate();
 
   const toggleMenu = () => setOpen(!open);
 
   useEffect(() => {
-  
     const getStoredName = () => {
       const candidates = [
         localStorage.getItem("user_name"),
@@ -25,7 +26,6 @@ const Navbar = () => {
 
     setUserName(getStoredName());
 
-
     const handleUserUpdate = () => {
       setUserName(getStoredName());
     };
@@ -33,6 +33,29 @@ const Navbar = () => {
 
     return () => window.removeEventListener("userUpdated", handleUserUpdate);
   }, []);
+
+  // Handle scroll behavior
+  useEffect(() => {
+    const controlNavbar = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < 10) {
+        // Always show navbar at the top
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling down - hide navbar
+        setIsVisible(false);
+      } else {
+        // Scrolling up - show navbar
+        setIsVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", controlNavbar);
+    return () => window.removeEventListener("scroll", controlNavbar);
+  }, [lastScrollY]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -49,7 +72,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="glass-effect shadow-lg sticky top-0 z-50 border-b border-slate-800">
+    <nav 
+      className={`bg-slate-900 shadow-lg fixed top-0 left-0 right-0 z-50 border-b border-slate-800 transition-transform duration-300 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 group">
@@ -116,7 +143,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden glass-card shadow-inner flex flex-col space-y-4 px-6 py-4 border-t border-slate-700">
+        <div className="md:hidden bg-slate-900 shadow-inner flex flex-col space-y-4 px-6 py-4 border-t border-slate-700">
           <Link onClick={toggleMenu} to="/tts" className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2">
             <FaMicrophone size={16} />
             <span>TTS</span>

@@ -64,7 +64,7 @@ const TextToSpeech = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex-grow flex flex-col items-center justify-center px-4 py-8 relative">
+      <div className="flex-grow flex flex-col items-center justify-center px-4 py-8 relative bg-slate-700">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-20 w-32 h-32 bg-cyan-400/10 rounded-full blur-xl animate-pulse"></div>

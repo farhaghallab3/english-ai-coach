@@ -3,7 +3,7 @@ import { FaFacebook, FaInstagram, FaHeart, FaRocket } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="glass-effect mt-16 border-t border-slate-800">
+    <footer className="bg-slate-800 t-16 border-t border-slate-700">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* Left - Logo and Text */}

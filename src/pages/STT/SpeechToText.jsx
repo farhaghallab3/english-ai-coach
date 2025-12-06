@@ -84,7 +84,7 @@ const SpeechToText = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex-grow flex flex-col items-center justify-center px-4 py-8 relative">
+      <div className="flex-grow flex flex-col items-center justify-center px-4 py-8 relative bg-slate-700">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-16 right-20 w-40 h-40 bg-violet-400/10 rounded-full blur-xl animate-pulse"></div>
@@ -118,7 +118,7 @@ const SpeechToText = () => {
             <div className={`px-4 py-2 rounded-full text-sm font-medium ${
               isListening
                 ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                : 'bg-gray-700/50 text-gray-400 border border-gray-600'
+                : 'bg-gray-600/50 text-white border border-gray-600'
             }`}>
               {isListening ? (
                 <span className="flex items-center gap-2">
@@ -139,7 +139,7 @@ const SpeechToText = () => {
             <button
               onClick={toggleMic}
               disabled={!isSupported}
-              className={`relative p-8 rounded-full text-white text-3xl shadow-2xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`relative p-8 rounded-full text-gray-400 text-3xl shadow-2xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
                 isListening
                   ? 'bg-red-500 animate-pulse shadow-red-500/50'
                   : 'btn-primary shadow-cyan-500/30 hover:shadow-cyan-500/50'
