@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { FaRobot, FaUserAlt, FaVolumeUp, FaMicrophone } from "react-icons/fa";
+import { Bot, User, Volume2, Mic } from "lucide-react";
+import { speakText } from "../../utils/ttsApi";
 
 const ChatWithAI = () => {
   const [messages, setMessages] = useState([]);
@@ -60,21 +61,20 @@ const ChatWithAI = () => {
   };
 
 
-  const speak = (text) => {
-    const synth = window.speechSynthesis;
-    const voices = synth.getVoices();
-    const maleVoice =
-      voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("male") ||
-          v.name.toLowerCase().includes("daniel") ||
-          v.name.toLowerCase().includes("google uk english male")
-      ) || voices[0];
-
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.voice = maleVoice;
-    utter.rate = 1;
-    synth.speak(utter);
+  const speak = async (text) => {
+    try {
+      await speakText(text, "bella");
+    } catch (error) {
+      console.error('TTS failed in chat:', error);
+      // Fallback to browser TTS if API fails
+      const synth = window.speechSynthesis;
+      const voices = synth.getVoices();
+      const fallbackVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.voice = fallbackVoice;
+      utter.rate = 1;
+      synth.speak(utter);
+    }
   };
 
   
@@ -121,19 +121,26 @@ const ChatWithAI = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex flex-col items-center justify-center flex-grow px-2 md:px-4 py-4 md:py-8">
-        <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl glass-card shadow-2xl overflow-hidden">
+      <div className="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 relative bg-slate-700">
+        {/* Background decorations */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-cyan-400/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-32 right-16 w-24 h-24 bg-violet-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-amber-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+
+        <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl glass-card shadow-2xl overflow-hidden relative z-10 scale-in">
           <div className="bg-gradient-animated text-white text-center py-4 md:py-6 text-lg md:text-2xl font-bold flex items-center justify-center gap-2 md:gap-3">
-            <FaRobot className="text-lg md:text-2xl" />
+            <Bot className="text-lg md:text-2xl" />
             AI Chat Tutor
-            <FaRobot className="text-lg md:text-2xl" />
+            <Bot className="text-lg md:text-2xl" />
           </div>
 
           {/* Chat Messages */}
           <div className="h-96 md:h-[70vh] overflow-y-auto p-4 md:p-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
             {messages.length === 0 && (
               <div className="text-center text-gray-400 py-8 md:py-12">
-                <FaRobot className="text-4xl md:text-6xl mx-auto mb-4 opacity-50" />
+                <Bot className="text-4xl md:text-6xl mx-auto mb-4 opacity-50" />
                 <p className="text-base md:text-xl">Start a conversation with your AI tutor!</p>
                 <p className="text-xs md:text-sm mt-2">Ask questions, practice pronunciation, or just chat in English.</p>
               </div>
@@ -148,7 +155,7 @@ const ChatWithAI = () => {
               >
                 {msg.sender === "bot" && (
                   <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-full flex items-center justify-center shadow-lg">
-                    <FaRobot className="text-white text-xs md:text-sm" />
+                    <Bot className="text-white text-xs md:text-sm" />
                   </div>
                 )}
 
@@ -168,14 +175,14 @@ const ChatWithAI = () => {
                       className="absolute -right-2 md:-right-3 -top-2 md:-top-3 w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg"
                       title="Listen to response"
                     >
-                      <FaVolumeUp size={10} className="md:w-3 md:h-3" />
+                      <Volume2 size={10} className="md:w-3 md:h-3" />
                     </button>
                   )}
                 </div>
 
                 {msg.sender === "user" && (
                   <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-violet-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                    <FaUserAlt className="text-white text-xs md:text-sm" />
+                    <User className="text-white text-xs md:text-sm" />
                   </div>
                 )}
               </div>
@@ -193,7 +200,7 @@ const ChatWithAI = () => {
               }`}
               title={isListening ? "Listening..." : "Voice input"}
             >
-              <FaMicrophone size={16} className="md:w-5 md:h-5" />
+              <Mic size={16} className="md:w-5 md:h-5" />
             </button>
 
             <input

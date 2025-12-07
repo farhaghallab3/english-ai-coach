@@ -1,7 +1,7 @@
 // src/pages/PronunciationPractice.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaBookOpen, FaTrophy, FaStar, FaArrowLeft, FaCheckCircle } from "react-icons/fa";
+import { BookOpen, Trophy, Star, ArrowLeft, CheckCircle } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import WordPractice from "../../components/WordPractice";
@@ -48,22 +48,22 @@ const PronunciationPractice = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex-grow py-8 px-4 relative">
+      <div className="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 relative bg-slate-700">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-20 w-32 h-32 bg-cyan-400/5 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-32 right-16 w-40 h-40 bg-violet-400/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-amber-400/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-16 left-20 w-32 h-32 bg-cyan-400/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-32 right-16 w-40 h-40 bg-violet-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-amber-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-6xl relative z-10">
           {/* Level Selection */}
           {!selectedLevel && !selectedWord && (
             <div className="text-center scale-in">
               <div className="mb-8">
                 <div className="flex items-center justify-center gap-4 mb-4">
                   <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
-                    <FaBookOpen />
+                    <BookOpen />
                   </div>
                   <h1 className="text-4xl md:text-6xl font-black text-gradient">
                     Pronunciation Practice
@@ -118,7 +118,7 @@ const PronunciationPractice = () => {
                   onClick={() => setSelectedLevel(null)}
                   className="btn-secondary flex items-center gap-2 hover:bg-slate-600"
                 >
-                  <FaArrowLeft />
+                  <ArrowLeft />
                   Back to Levels
                 </button>
                 <div className="text-right">
@@ -143,7 +143,7 @@ const PronunciationPractice = () => {
                     >
                       {isCompleted && (
                         <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                          <FaCheckCircle className="text-white text-xs" />
+                          <CheckCircle className="text-white text-xs" />
                         </div>
                       )}
 
@@ -178,7 +178,7 @@ const PronunciationPractice = () => {
               {/* Progress Summary */}
               <div className="mt-8 glass-card p-6 max-w-md mx-auto text-center">
                 <div className="flex items-center justify-center gap-3 mb-4">
-                  <FaTrophy className="text-amber-400 text-xl" />
+                  <Trophy className="text-amber-400 text-xl" />
                   <h3 className="text-xl font-bold text-white">Your Progress</h3>
                 </div>
                 <div className="flex items-center justify-center gap-4 text-sm">

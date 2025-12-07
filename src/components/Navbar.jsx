@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaBars, FaTimes, FaMicrophone, FaRobot, FaComments, FaBookOpen } from "react-icons/fa";
-import { FiLogOut } from "react-icons/fi";
-import { MdDashboard } from "react-icons/md";
+import { Menu, X, Mic, Bot, MessageCircle, BookOpen, LogOut, LayoutDashboard } from "lucide-react";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -80,27 +78,27 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 group">
-          <img src="/logo.png" alt="Logo" className="w-10 h-10 float-animation" />
-          <span className="text-2xl font-bold text-gradient group-hover:scale-105 transition-transform duration-300">Own Language</span>
+          <img src="/logo.png" alt="English AI Coach Logo" className="w-10 h-10 float-animation" />
+          <span className="text-2xl font-bold text-gradient group-hover:scale-105 transition-transform duration-300">English AI Coach</span>
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-6 text-gray-300 font-medium items-center">
           <Link to="/tts" className="flex items-center space-x-1 hover:text-cyan-400 transition-all duration-300 hover:scale-105">
-            <FaMicrophone size={16} />
-            <span>TTS</span>
+            <Mic size={16} />
+            <span>Text-to-Speech</span>
           </Link>
           <Link to="/stt" className="flex items-center space-x-1 hover:text-cyan-400 transition-all duration-300 hover:scale-105">
-            <FaMicrophone size={16} />
-            <span>STT</span>
+            <Mic size={16} />
+            <span>Speech-to-Text</span>
           </Link>
           <Link to="/chat" className="flex items-center space-x-1 hover:text-cyan-400 transition-all duration-300 hover:scale-105">
-            <FaComments size={16} />
-            <span>Chat</span>
+            <MessageCircle size={16} />
+            <span>AI Chat</span>
           </Link>
           <Link to="/practice" className="flex items-center space-x-1 hover:text-cyan-400 transition-all duration-300 hover:scale-105">
-            <FaBookOpen size={16} />
-            <span>Practice</span>
+            <BookOpen size={16} />
+            <span>Pronunciation</span>
           </Link>
 
           {userName ? (
@@ -110,7 +108,7 @@ const Navbar = () => {
                 className="btn-primary flex items-center gap-2"
                 title="Go to your dashboard"
               >
-                <MdDashboard size={18} />
+                <LayoutDashboard size={18} />
                 <span>{userName.split(" ")[0]}'s Dashboard</span>
               </button>
               {/* Logout Icon */}
@@ -119,7 +117,7 @@ const Navbar = () => {
                 className="text-gray-400 hover:text-red-400 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-red-500/10"
                 title="Logout"
               >
-                <FiLogOut size={22} />
+                <LogOut size={22} />
               </button>
             </div>
           ) : (
@@ -137,7 +135,7 @@ const Navbar = () => {
           onClick={toggleMenu}
           className="md:hidden text-gray-300 text-2xl focus:outline-none hover:text-blue-400 transition-colors"
         >
-          {open ? <FaTimes /> : <FaBars />}
+          {open ? <X /> : <Menu />}
         </button>
       </div>
 
@@ -145,20 +143,20 @@ const Navbar = () => {
       {open && (
         <div className="md:hidden bg-slate-900 shadow-inner flex flex-col space-y-4 px-6 py-4 border-t border-slate-700">
           <Link onClick={toggleMenu} to="/tts" className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2">
-            <FaMicrophone size={16} />
-            <span>TTS</span>
+            <Mic size={16} />
+            <span>Text-to-Speech</span>
           </Link>
           <Link onClick={toggleMenu} to="/stt" className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2">
-            <FaMicrophone size={16} />
-            <span>STT</span>
+            <Mic size={16} />
+            <span>Speech-to-Text</span>
           </Link>
           <Link onClick={toggleMenu} to="/chat" className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2">
-            <FaComments size={16} />
-            <span>Chat</span>
+            <MessageCircle size={16} />
+            <span>AI Chat</span>
           </Link>
           <Link onClick={toggleMenu} to="/practice" className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2">
-            <FaBookOpen size={16} />
-            <span>Practice</span>
+            <BookOpen size={16} />
+            <span>Pronunciation</span>
           </Link>
 
           {userName ? (
@@ -169,7 +167,7 @@ const Navbar = () => {
                   className="btn-primary flex items-center gap-2 text-sm"
                   title="Go to your dashboard"
                 >
-                  <MdDashboard size={16} />
+                  <LayoutDashboard size={16} />
                   <span>{userName.split(" ")[0]}'s Dashboard</span>
                 </button>
                 <button
@@ -180,7 +178,7 @@ const Navbar = () => {
                   className="text-gray-400 hover:text-red-400 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-red-500/10"
                   title="Logout"
                 >
-                  <FiLogOut size={20} />
+                  <LogOut size={20} />
                 </button>
               </div>
             </>

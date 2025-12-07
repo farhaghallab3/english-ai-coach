@@ -80,7 +80,7 @@ const HomePage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
               <img
                 src="/logo.png"
-                alt="Own Language Logo"
+                alt="English AI Coach Logo"
                 className="w-80 md:w-96 relative z-10 float-animation"
               />
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-r from-cyan-400 to-violet-500 rounded-full flex items-center justify-center text-2xl animate-bounce">

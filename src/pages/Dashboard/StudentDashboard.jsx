@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaTrophy, FaBookOpen, FaChartLine, FaStar, FaArrowRight } from "react-icons/fa";
+import { Trophy, BookOpen, TrendingUp, Star, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -84,21 +84,21 @@ export default function StudentDashboard() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex-grow py-8 px-4 relative">
+      <div className="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 relative bg-slate-700">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-20 w-32 h-32 bg-cyan-400/5 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-32 right-16 w-40 h-40 bg-violet-400/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-amber-400/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-16 left-20 w-32 h-32 bg-cyan-400/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-32 right-16 w-40 h-40 bg-violet-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-amber-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-6xl relative z-10">
           {/* Welcome Header */}
           <div className="text-center mb-8 scale-in">
             <div className="mb-6">
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
-                  <FaTrophy />
+                  <Trophy />
                 </div>
                 <h1 className="text-4xl md:text-6xl font-black text-gradient">
                   Your Dashboard
@@ -118,7 +118,7 @@ export default function StudentDashboard() {
                   <p className="text-gray-400 text-sm">Current Level</p>
                   <p className="text-2xl font-bold text-white">{currentLevel}</p>
                 </div>
-                <FaTrophy className="text-yellow-400 text-3xl" />
+                <Trophy className="text-yellow-400 text-3xl" />
               </div>
             </div>
 
@@ -128,7 +128,7 @@ export default function StudentDashboard() {
                   <p className="text-gray-400 text-sm">Words Practiced</p>
                   <p className="text-2xl font-bold text-white">{totalCompleted}</p>
                 </div>
-                <FaBookOpen className="text-green-400 text-3xl" />
+                <BookOpen className="text-green-400 text-3xl" />
               </div>
             </div>
 
@@ -140,7 +140,7 @@ export default function StudentDashboard() {
                     {totalWords > 0 ? Math.round((totalCompleted / totalWords) * 100) : 0}%
                   </p>
                 </div>
-                <FaChartLine className="text-purple-400 text-3xl" />
+                <TrendingUp className="text-purple-400 text-3xl" />
               </div>
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function StudentDashboard() {
           {/* Level Progress */}
           <div className="card p-6 mb-8">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <FaStar className="text-yellow-400" />
+              <Star className="text-yellow-400" />
               Pronunciation Practice Progress
             </h2>
 
@@ -182,13 +182,13 @@ export default function StudentDashboard() {
                 className="flex items-center justify-between p-4 bg-gradient-to-r from-cyan-400 to-violet-500 text-white rounded-lg hover:from-cyan-500 hover:to-violet-600 transition-all hover:scale-105"
               >
                 <div className="flex items-center gap-3">
-                  <FaBookOpen />
+                  <BookOpen />
                   <div className="text-left">
                     <p className="font-semibold">Pronunciation Practice</p>
                     <p className="text-sm opacity-90">Practice English words</p>
                   </div>
                 </div>
-                <FaArrowRight />
+                <ArrowRight />
               </button>
 
               <button
@@ -196,13 +196,13 @@ export default function StudentDashboard() {
                 className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-lg hover:from-emerald-500 hover:to-teal-600 transition-all hover:scale-105"
               >
                 <div className="flex items-center gap-3">
-                  <FaTrophy />
+                  <Trophy />
                   <div className="text-left">
                     <p className="font-semibold">Level Challenges</p>
                     <p className="text-sm opacity-90">Take on new levels</p>
                   </div>
                 </div>
-                <FaArrowRight />
+                <ArrowRight />
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaMicrophone, FaMicrophoneSlash, FaCopy, FaTrash, FaPlay, FaPause } from "react-icons/fa";
+import { Mic, MicOff, Copy, Trash2, Play, Pause } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
@@ -84,7 +84,7 @@ const SpeechToText = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex-grow flex flex-col items-center justify-center px-4 py-8 relative bg-slate-700">
+      <div className="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 relative bg-slate-700">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-16 right-20 w-40 h-40 bg-violet-400/10 rounded-full blur-xl animate-pulse"></div>
@@ -97,7 +97,7 @@ const SpeechToText = () => {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="w-16 h-16 bg-gradient-to-r from-violet-400 to-violet-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
-                <FaMicrophone />
+                <Mic />
               </div>
               <h1 className="text-4xl md:text-5xl font-black text-gradient">
                 Speech to Text
@@ -145,7 +145,7 @@ const SpeechToText = () => {
                   : 'btn-primary shadow-cyan-500/30 hover:shadow-cyan-500/50'
               }`}
             >
-              {isListening ? <FaMicrophoneSlash /> : <FaMicrophone />}
+              {isListening ? <MicOff /> : <Mic />}
 
               {/* Ripple effect when listening */}
               {isListening && (
@@ -186,14 +186,14 @@ const SpeechToText = () => {
                 onClick={copyToClipboard}
                 className="btn-secondary text-lg px-6 py-3 hover:bg-cyan-500/10 hover:border-cyan-400 flex items-center gap-2"
               >
-                <FaCopy />
+                <Copy />
                 Copy
               </button>
               <button
                 onClick={clearText}
                 className="btn-secondary text-lg px-6 py-3 hover:bg-red-500/10 hover:border-red-400 flex items-center gap-2"
               >
-                <FaTrash />
+                <Trash2 />
                 Clear
               </button>
             </div>
